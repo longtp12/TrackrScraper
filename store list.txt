@@ -1,0 +1,27 @@
+haloshop.vn             X           type 1
+hanoigame               X           type 1
+gameshoptl.com          X           type 1
+hoangyengame.com        X           type 1
+34gameshop.vn           X           type 1
+xgame                   X           type 1
+htcgame                 X           type 1
+herogame.vn             X           type 1
+logashop                X           type 1
+mimigame.vn             X           type 2
+nshop.com.vn            X           type 1
+m10store.vn             X           type 1
+muagame.vn              X           type 1
+gameus.com.vn           X           type 1
+gamestation.com.vn      X           type 2
+hacom                   X           type 1 (puppeteer)
+gamescenter.vn          X           type 1
+masta                   X           type 1
+boxxgame                X           type 1
+shoptrongnghia          X           type 1
+bachtungps              X           type 1
+progame                 X           type 1
+mcgame                  X           type 1
+geekymart               X           type 2
+Tiki                    X
+Lazada                  slow performance due to using puppeteer
+Shopee                  has anti scraping mechanism?
