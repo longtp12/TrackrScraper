@@ -111,9 +111,16 @@ const uploadToDB = async (gameData) => {
 
 export const scrapeLazada = async (isProcessing, initialPage) => {
   const oneHour = 60 * 60 * 1000;
+  const twoMins = 2 * 60 * 1000;
   const browser = await puppeteer.launch({
-    headless: "new",
     userDataDir: "./userDataDir",
+    args:[
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote,"
+    ],
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
   });
   if (!isProcessing) return;
   const page = await browser.newPage();
@@ -122,7 +129,7 @@ export const scrapeLazada = async (isProcessing, initialPage) => {
     isProcessing = false;
     console.log("Scraping stopped. Time limit exceeded (1 hour).");
     browser.close();
-  }, oneHour);
+  }, twoMins);
 
   try {
     await scrapeByGameTitles(page, browser, initialPage);

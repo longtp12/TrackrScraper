@@ -36,8 +36,8 @@ router.get("/status", (req, res) => {
 router.get("/scrapeWebstore", blockRequests, async (req, res) => {
   try {
     const stores = await Store.find();
+    await scrapeAllStoresType1Cheerio(stores);
     await scrapeAllStoreType2(stores);
-    // await scrapeAllStoresType1Cheerio(stores);
     await request.get("/user");
     res.status(200).json({ type: "success", message: "Done scraping" });
   } catch (error) {
