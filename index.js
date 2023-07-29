@@ -52,6 +52,6 @@ mongoose
   .then(() => console.log("DB connection succesful"))
   .catch((err) => console.log(err));
 
-app.listen(6000, () => {
+app.listen(8006, () => {
   console.log("Scraper server is running");
 });

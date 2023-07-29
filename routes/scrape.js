@@ -21,14 +21,17 @@ const blockRequests = (req, res, next) => {
   next();
 };
 
-router.get("/cancelScrape", (req, res) => {
-  // Set the cancel flag to true to stop scraping
-  cancelFlag = true;
-  return res.json({
-    type: "success",
-    message: "Scraping process is canceled.",
-  });
+router.get("/status", (req, res) => {
+  try {
+    let status;
+    if (!isProcessing) status = "Ready";
+    else status = "In progress";
+    return res.status(200).json({ type: "success", message: status });
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
+
 
 router.get("/scrapeWebstore", blockRequests, async (req, res) => {
   try {
