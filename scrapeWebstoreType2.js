@@ -6,7 +6,15 @@ import { uploadToDB, uploadToDBAnyway } from "./scrapeWebstoreType1.js";
 
 const launchBrowser = async (stores) => {
   // const browser = await puppeteer.launch({ headless: false });
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({ 
+    args:[
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote,"
+    ],
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+  });
   const page = await browser.newPage();
   try {
     await scrapeAllStoresType2(page, stores);
