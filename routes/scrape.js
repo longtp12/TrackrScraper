@@ -1,5 +1,5 @@
 import express from "express";
-import Store from "../Models/Store.js";
+import Store from "../models/Store.js";
 import { scrapeAllStoresType1Cheerio } from "../scrapeWebstoreType1.js";
 import { scrapeAllStoreType2 } from "../scrapeWebstoreType2.js";
 import { scrapeLazada } from "../scrapeLazada.js";
