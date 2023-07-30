@@ -11,6 +11,7 @@ const scrapeSearch = async (page, url) => {
       const price = e.querySelector(".ooOxS").innerText;
       const link = e.querySelector(".RfADt a").href;
       const formattedPrice = price.replace(/[^\d]/g, "");
+      console.log(title);
       return {
         title,
         retailPrice: [{ price: formattedPrice }],
@@ -135,9 +136,5 @@ export const scrapeLazada = async (isProcessing, initialPage) => {
     await scrapeByGameTitles(page, browser, initialPage);
   } catch (error) {
     // console.log(error);
-  } finally {
-    clearTimeout(timeoutId);
-    console.log("Closing browser");
-    await browser.close();
-  }
+  } 
 };
