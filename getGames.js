@@ -16,24 +16,25 @@ const getGameDetails = async (gameId) => {
 
 // Usage
 
-const getGamesByPlatform = async (platform, totalPages) => {
+export const getGamesByPlatform = async (platform) => {
   const apiKey = "9bb25f76335d42f4a4be5b872a9dca9c";
   const pageSize = 35; // Set a large value for page_size (e.g., 40)
 
   try {
-    for (let page = 18; page <= totalPages; page++) {
-      const url = `https://api.rawg.io/api/games?key=${apiKey}&platforms=${platform}&page_size=${pageSize}&released=true&page=${page}`;
+    for (let page = 1; page <= 2; page++) {
+      const url = `https://api.rawg.io/api/games?key=${apiKey}&platforms=${platform}&page_size=${pageSize}&released=true&page=${page}&ordering=-released`;
       const response = await axios.get(url);
       const gamesData = response.data.results;
       // Process each game data and retrieve the game details
 
       const retrievedGames = [];
       for (const game of gamesData) {
+        console.log(game.name);
         const gameDetails = await getGameDetails(game.id);
-        const shortScreenshots = game?.short_screenshots.map(
+        const shortScreenshots = game?.short_screenshots?.map(
           (screenshots) => screenshots.image
         );
-        const genres = game.genres?.map((genre) => genre.name);
+        const genres = game?.genres?.map((genre) => genre.name);
         const platforms = game?.parent_platforms.map(
           (platform) => platform.platform.name
         );
@@ -73,7 +74,7 @@ const getGamesByPlatform = async (platform, totalPages) => {
       retrievedGames.length = 0;
     }
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error:", error);
   }
 };
 const uploadGames = async () => {
@@ -82,7 +83,7 @@ const uploadGames = async () => {
   const ps3 = 16;
   const nintendoSwitch = 7;
   const totalPages = 92;
-  await getGamesByPlatform(ps3, totalPages);
+  await getGamesByPlatform(ps3);
   // console.log(games);
   console.log("Finished Uploading");
 };
@@ -165,4 +166,4 @@ const deleteGameByStore = async (store) => {
 
 
 
-deleteGameByStore("gamestation");
+// deleteGameByStore("gamestation");

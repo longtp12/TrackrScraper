@@ -14,3 +14,29 @@ export const getGamesPaging = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+export const addGames = async (req, res) => {
+  const gamesData = req.body.games;
+  try {
+    const newGames = [];
+
+    for (const gameData of gamesData) {
+      const { title } = gameData;
+
+      // Check if the game copy already exists
+      const existingGame = await Game.findOne({ title });
+
+      if (existingGame) {
+        console.log(`Skipping existing game copy: ${title}`);
+        continue; // Skip to the next game copy
+      }
+
+      const newGame = await Game.create(gameData);
+      newGames.push(newGame);
+    }
+
+    res.status(200).json(newGames);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};

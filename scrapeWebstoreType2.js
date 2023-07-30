@@ -169,6 +169,6 @@ const getStores = async () => {
   return response.data;
 };
 
-export const scrapeAllStoreType2 = async (stores) => {
-  launchBrowser(stores);
+export const scrapeAllStoreType2 = async (filteredStores, stores) => {
+  launchBrowser(filteredStores, stores);
 };

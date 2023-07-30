@@ -6,6 +6,7 @@ import { request } from "../requestMethod.js";
 import { scrapeLazada } from "../scrapeLazada.js";
 import { scrapeAllStoresType1Cheerio } from "../scrapeWebstoreType1.js";
 import { scrapeAllStoreType2 } from "../scrapeWebstoreType2.js";
+import { getGamesByPlatform } from "../getGames.js";
 
 const router = express.Router();
 
@@ -118,10 +119,28 @@ router.get("/getLastScrape", async (req, res) => {
   res.json(scrape[0]);
 });
 
-
 router.get("/getLastScrapeWebstore", async (req, res) => {
   const scrape = await LastScrapeWebstore.find();
   res.json(scrape[0]);
+});
+
+router.get("/scrapeGames/", blockRequests, async (req, res) => {
+  try {
+    const platform = req.query.platform;
+    let platformId;
+    if (platform === "ps5") platformId = 187;
+    else if (platform === "ps4") platformId = 18;
+    else if (platform === "ps3") platformId = 16;
+    else if (platform === "switch") platformId = 7;
+    else return res.json({ type: "error", message: "Invalid platform" });
+
+    await getGamesByPlatform(platformId);
+    res.status(200).json({ type: "success", message: "finish scraping" });
+  } catch (error) {
+    res.status(500).json(error);
+  } finally {
+    isProcessing = false;
+  }
 });
 
 export default router;
