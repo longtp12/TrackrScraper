@@ -129,7 +129,7 @@ export const scrapeLazada = async (isProcessing, initialPage) => {
     isProcessing = false;
     console.log("Scraping stopped. Time limit exceeded (1 hour).");
     browser.close();
-  }, twoMins);
+  }, oneHour);
 
   try {
     await scrapeByGameTitles(page, browser, initialPage);
