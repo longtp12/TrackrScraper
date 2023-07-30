@@ -3,12 +3,18 @@ import cheerio from "cheerio";
 import { request } from "./requestMethod.js";
 
 
-export const scrapeAllStoresType1Cheerio = async (stores) => {
+export const scrapeAllStoresType1Cheerio = async (filteredStores,stores) => {
   try {
     const scrapedGames = [];
 
-    for (const store of stores) {
+    for (const store of filteredStores) {
       if (store.type === 1) {
+        const storeIndex = stores.indexOf(store);
+        await request.put("/scrape/lastScrapeWebstore", {
+          lastScrapeAt: Date.now(),
+          lastScrapeAtStore: store.name,
+          lastScrapeAtStoreIndex: storeIndex,
+        });
         console.log("Scraping from store: " + store.name);
         await scrapePlatformsType1Cheerio(store, scrapedGames);
       }

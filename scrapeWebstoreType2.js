@@ -1,23 +1,23 @@
 import { request } from "./requestMethod.js";
 import puppeteer from "puppeteer";
-import j2cp from "json2csv"
+import j2cp from "json2csv";
 import fs from "fs";
 import { uploadToDB, uploadToDBAnyway } from "./scrapeWebstoreType1.js";
 
-const launchBrowser = async (stores) => {
+const launchBrowser = async (filteredStores, stores) => {
   // const browser = await puppeteer.launch({ headless: false });
-  const browser = await puppeteer.launch({ 
-    args:[
+  const browser = await puppeteer.launch({
+    args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
       "--single-process",
-      "--no-zygote,"
+      "--no-zygote,",
     ],
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
   });
   const page = await browser.newPage();
   try {
-    await scrapeAllStoresType2(page, stores);
+    await scrapeAllStoresType2(page, filteredStores, stores);
   } catch (err) {
     console.error(err);
   } finally {
@@ -25,10 +25,16 @@ const launchBrowser = async (stores) => {
   }
 };
 
-const scrapeAllStoresType2 = async (page, stores) => {
+const scrapeAllStoresType2 = async (page, filteredStores, stores) => {
   let allScrapedGames = [];
-  for (const store of stores) {
+  for (const store of filteredStores) {
     if (store.type === 2) {
+      const storeIndex = stores.indexOf(store);
+      await request.put("/scrape/lastScrapeWebstore", {
+        lastScrapeAt: Date.now(),
+        lastScrapeAtStore: store.name,
+        lastScrapeAtStoreIndex: storeIndex,
+      });
       console.log("Scraping from store: " + store.name);
       const scrapedGames = await scrapePlatformsType2(page, store);
       allScrapedGames = allScrapedGames.concat(scrapedGames);
@@ -80,9 +86,11 @@ const scrapeOneUrlType2 = async (page, store, url, platform) => {
               const title = e.querySelector(
                 store.productTitleSelector
               )?.innerText;
-              const currentPrice = Number(extractPriceValue(
-                e.querySelector(store.productCurrentPriceSelector)?.innerText
-              ));
+              const currentPrice = Number(
+                extractPriceValue(
+                  e.querySelector(store.productCurrentPriceSelector)?.innerText
+                )
+              );
               const originalPrice = extractPriceValue(
                 e.querySelector(store.productOriginalPriceSelector)?.innerText
               );
@@ -116,7 +124,7 @@ const scrapeOneUrlType2 = async (page, store, url, platform) => {
       //   UPLOAD TO DB
 
       // await uploadToDB(games)
-      await uploadToDBAnyway(games)
+      await uploadToDBAnyway(games);
 
       const nextButton = await page.$(store.nextPageSelector);
 

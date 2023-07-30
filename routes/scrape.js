@@ -1,10 +1,11 @@
 import express from "express";
+import LastScrapeLazada from "../models/LastScrapeLazada.js";
+import LastScrapeWebstore from "../models/LastScrapeWebstore.js";
 import Store from "../models/Store.js";
+import { request } from "../requestMethod.js";
+import { scrapeLazada } from "../scrapeLazada.js";
 import { scrapeAllStoresType1Cheerio } from "../scrapeWebstoreType1.js";
 import { scrapeAllStoreType2 } from "../scrapeWebstoreType2.js";
-import { scrapeLazada } from "../scrapeLazada.js";
-import { request } from "../requestMethod.js";
-import LastScrapeLazada from "../models/LastScrapeLazada.js";
 
 const router = express.Router();
 
@@ -32,12 +33,18 @@ router.get("/status", (req, res) => {
   }
 });
 
-
 router.get("/scrapeWebstore", blockRequests, async (req, res) => {
   try {
     const stores = await Store.find();
-    await scrapeAllStoresType1Cheerio(stores);
-    await scrapeAllStoreType2(stores);
+    const lastScrape = await LastScrapeWebstore.find();
+    const storeIndex = lastScrape[0].lastScrapeAtStoreIndex;
+    let filteredStores;
+    if (storeIndex < stores.length - 1) {
+      filteredStores = stores.slice(storeIndex);
+    } else filteredStores = stores;
+
+    await scrapeAllStoreType2(filteredStores, stores);
+    await scrapeAllStoresType1Cheerio(filteredStores, stores);
     await request.get("/user");
     res.status(200).json({ type: "success", message: "Done scraping" });
   } catch (error) {
@@ -83,8 +90,37 @@ router.put("/lastScrape", async (req, res) => {
   }
 });
 
+router.put("/lastScrapeWebstore", async (req, res) => {
+  try {
+    const lastScrape = await LastScrapeWebstore.find();
+    if (lastScrape.length === 0) {
+      const newLastScrape = new LastScrapeWebstore({
+        lastScrapeAt: req.body.lastScrapeAt,
+        lastScrapeAtStore: req.body.lastScrapeAtStore,
+        lastScrapeAtStoreIndex: req.body.lastScrapeAtStoreIndex,
+      });
+      await newLastScrape.save();
+    } else {
+      const lastScrapeDoc = lastScrape[0];
+      lastScrapeDoc.lastScrapeAt = req.body.lastScrapeAt;
+      lastScrapeDoc.lastScrapeAtStore = req.body.lastScrapeAtStore;
+      lastScrapeDoc.lastScrapeAtStoreIndex = req.body.lastScrapeAtStoreIndex;
+      await lastScrapeDoc.save();
+    }
+    res.status(200).json({ type: "success", message: "Save successful" });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 router.get("/getLastScrape", async (req, res) => {
   const scrape = await LastScrapeLazada.find();
+  res.json(scrape[0]);
+});
+
+
+router.get("/getLastScrapeWebstore", async (req, res) => {
+  const scrape = await LastScrapeWebstore.find();
   res.json(scrape[0]);
 });
 
