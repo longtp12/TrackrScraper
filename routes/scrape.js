@@ -7,6 +7,7 @@ import { scrapeLazada } from "../scrapeLazada.js";
 import { scrapeAllStoresType1Cheerio } from "../scrapeWebstoreType1.js";
 import { scrapeAllStoreType2 } from "../scrapeWebstoreType2.js";
 import { getGamesByPlatform } from "../getGames.js";
+import LastScrapeGames from "../models/LastScrapeGames.js";
 
 const router = express.Router();
 
@@ -124,7 +125,7 @@ router.get("/getLastScrapeWebstore", async (req, res) => {
   res.json(scrape[0]);
 });
 
-router.get("/scrapeGames/", blockRequests, async (req, res) => {
+router.get("/scrapeGames", blockRequests, async (req, res) => {
   try {
     const platform = req.query.platform;
     let platformId;
@@ -142,5 +143,32 @@ router.get("/scrapeGames/", blockRequests, async (req, res) => {
     isProcessing = false;
   }
 });
+
+router.put("/lastScrapeGames", async (req, res) => {
+  try {
+    const lastScrape = await LastScrapeGames.find();
+    if (lastScrape.length === 0) {
+      const newLastScrape = new LastScrapeGames({
+        lastScrapeAt: req.body.lastScrapeAt,
+        lastScrapePlatform: req.body.lastScrapePlatform,
+      });
+      await newLastScrape.save();
+    } else {
+      const lastScrapeDoc = lastScrape[0];
+      lastScrapeDoc.lastScrapeAt = req.body.lastScrapeAt;
+      lastScrapeDoc.lastScrapePlatform = req.body.lastScrapePlatform;
+      await lastScrapeDoc.save();
+    }
+    res.status(200).json({ type: "success", message: "Save successful" });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+router.get("/getLastScrapeGames", async (req, res) => {
+  const scrape = await LastScrapeGames.find();
+  res.json(scrape[0]);
+});
+
 
 export default router;
