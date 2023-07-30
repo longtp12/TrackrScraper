@@ -137,6 +137,7 @@ export const scrapeLazada = async (isProcessing, initialPage) => {
     // console.log(error);
   } finally {
     clearTimeout(timeoutId);
+    console.log("Closing browser");
     await browser.close();
   }
 };
